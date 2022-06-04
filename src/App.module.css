@@ -1,0 +1,10 @@
+.wrapper {
+  max-width: 70rem;
+  margin: 2rem auto;
+  padding: 0 1rem; /*If the screen is less than 70rem (1120px), the content will not "glue" in the border*/
+
+  display: grid;
+  grid-template-columns: 16rem 1fr;
+  gap: 2rem;
+  align-items: flex-start;
+}
