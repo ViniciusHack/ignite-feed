@@ -1,7 +1,7 @@
 
 import { format, formatDistanceToNow } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
-import { FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useCallback, useState } from 'react';
 import { Author, Content } from '../../App';
 import { Avatar } from '../Avatar';
 import { Comment } from '../Comment';
@@ -35,6 +35,23 @@ export function Post({ author, content, publishedAt }: PostProps) {
     setNewCommentText('')
   }
 
+  function handleNewCommentChange(e: ChangeEvent<HTMLTextAreaElement>) {
+    e.target.setCustomValidity('');
+    setNewCommentText(e.target.value)
+  };
+
+  function handleNewCommentInvalid(e: ChangeEvent<HTMLTextAreaElement>) {
+    e.target.setCustomValidity("Esse campo é obrigatório")
+  };
+
+  const deleteComment = useCallback((comment: string) => {
+    setComments(
+      comments.filter(commentState => commentState !== comment)
+    )
+  }, [comments]);
+
+  const isNewCommentEmpty = !newCommentText; // or newCommentText.length === 0;
+
   return (
     <article className={styles.post}>
       <header>
@@ -67,18 +84,20 @@ export function Post({ author, content, publishedAt }: PostProps) {
         <textarea 
           name="comment"
           value={newCommentText}
-          onChange={(e) => setNewCommentText(e.target.value)}
+          onChange={handleNewCommentChange}
+          required
+          onInvalid={handleNewCommentInvalid}
           placeholder="Deixe um comentário"
         />
 
         <footer>
-          <button type="submit">Publicar</button>
+          <button type="submit" disabled={isNewCommentEmpty}>Publicar</button>
         </footer>
       </form>
 
       <div className={styles.commentList}>
         {comments.map(content => (
-          <Comment content={content}/>
+          <Comment onDeleteComment={deleteComment} key={content} content={content}/>
         ))}
       </div>
     </article>
